@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Ignorando execução do script
+# ==========================================
+# Ao realizar um push, alguns parâmetros úteis, obtidos via stdin, são
+# enviados para este script. E os utilizamos diversas finalidades, inclusive
+# cancelar a execução deste script. A execução é cancelada quando se está:
+#
+# - deletando branchs remotos, identificados pelo refname "refs/heads/*";
+# - criando tags no formato 0.0.0-0 detectadas via REGEX;
+# - fazendo push em branchs que feature, bugfix e hotfix.
+#
+# Abaixo, já obtemos o nome da branch atual e, em casos de branchs de teste,
+# o nome do desenvolvedor que está fazendo o push para utilizar em deploys.
+set -- "${1:-$(</dev/stdin)}"
+REFNAME=$(echo "$1" | cut -d' ' -f3)
+BRANCH=$(git rev-parse --symbolic --abbrev-ref "$REFNAME")
+REGEX='^[0-9]+[.][0-9]+[.][0-9]+[-]*[0-9]*$'
+
+[[ $BRANCH =~ $REGEX ]] && exit;
+case $BRANCH in
+  refs*|feature*|bugfix*|hotfix*) exit;;
+esac
+
+# Variáveis do projeto
+# ==========================================
+PROJECT="tesseract-kb"
+PROJECT_PATH="/var/www/$PROJECT"
+BARE="$PROJECT_PATH".git
+
+# Clone ou Pull
+# ==========================================
+
+# Se a pasta do branch não existe no diretório de trabalho,
+# clona o repositório Git já alterando o branch, e em seguida,
+# já acessa a pasta criada ou sai do script em caso de erro.
+if [ ! -d "$PROJECT_PATH/$BRANCH" ]; then
+
+  git clone $BARE -b "$BRANCH" "$PROJECT_PATH/$BRANCH"
+  cd "$PROJECT_PATH/$BRANCH" || exit
+
+# Se a pasta do branch existe, executa um checkout forçado para descartar
+# possíveis alterações neste branch e obtém o código mais recente.
+else
+
+  cd "$PROJECT_PATH/$BRANCH" || exit
+  unset GIT_DIR
+  git checkout -f "$BRANCH"
+  git pull origin "$BRANCH"
+
+fi
+
+
+# Deploy
+# ==========================================
+if [ -e "$PROJECT_PATH/$BRANCH".env ]; then
+  echo '-e .env'
+fi
+
+docker-compose down
+docker-compose up -d workspace mysql phpmyadmin
+docker-compose exec -T workspace composer install
+docker-compose exec -T workspace php artisan migrate --force
+docker-compose exec -T workspace php artisan db:seed --force
