@@ -6,7 +6,7 @@ services:
       - '${APPLICATION}:/var/www'
   workspace:
     build:
-      context: ../laradock/workspace
+      context: ${LARADOCK_PATH}/workspace
       args:
         - 'INSTALL_XDEBUG=${WORKSPACE_INSTALL_XDEBUG}'
         - 'INSTALL_BLACKFIRE=${INSTALL_BLACKFIRE}'
@@ -55,7 +55,7 @@ services:
       - backend
   php-fpm:
     build:
-      context: ../laradock/php-fpm
+      context: ${LARADOCK_PATH}/php-fpm
       args:
         - 'INSTALL_XDEBUG=${PHP_FPM_INSTALL_XDEBUG}'
         - 'INSTALL_BLACKFIRE=${INSTALL_BLACKFIRE}'
@@ -81,7 +81,7 @@ services:
     volumes_from:
       - applications
     volumes:
-      - '../laradock/php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini'
+      - '${LARADOCK_PATH}/php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini'
     expose:
       - '9000'
     depends_on:
@@ -94,7 +94,7 @@ services:
       - backend
   php-worker:
     build:
-      context: ../laradock/php-worker
+      context: ${LARADOCK_PATH}/php-worker
       dockerfile: 'Dockerfile-${PHP_VERSION}'
     volumes_from:
       - applications
@@ -106,7 +106,7 @@ services:
       - backend
   nginx:
     build:
-      context: ../laradock/nginx
+      context: ${LARADOCK_PATH}/nginx
       args:
         - 'PHP_UPSTREAM_CONTAINER=${NGINX_PHP_UPSTREAM_CONTAINER}'
         - 'PHP_UPSTREAM_PORT=${NGINX_PHP_UPSTREAM_PORT}'
@@ -134,7 +134,7 @@ services:
       - backend
   apache2:
     build:
-      context: ../laradock/apache2
+      context: ${LARADOCK_PATH}/apache2
       args:
         - 'PHP_UPSTREAM_CONTAINER=${APACHE_PHP_UPSTREAM_CONTAINER}'
         - 'PHP_UPSTREAM_PORT=${APACHE_PHP_UPSTREAM_PORT}'
@@ -153,7 +153,7 @@ services:
       - frontend
       - backend
   hhvm:
-    build: ../laradock/hhvm
+    build: ${LARADOCK_PATH}/hhvm
     volumes_from:
       - applications
     expose:
@@ -164,7 +164,7 @@ services:
       - frontend
       - backend
   minio:
-    build: ../laradock/minio
+    build: ${LARADOCK_PATH}/minio
     volumes:
       - 'minio:/export'
     ports:
@@ -176,7 +176,7 @@ services:
       - frontend
   mysql:
     build:
-      context: ../laradock/mysql
+      context: ${LARADOCK_PATH}/mysql
       args:
         - 'MYSQL_VERSION=${MYSQL_VERSION}'
     environment:
@@ -194,7 +194,7 @@ services:
       - backend
   percona:
     build:
-      context: ../laradock/percona
+      context: ${LARADOCK_PATH}/percona
     environment:
       - 'MYSQL_DATABASE=${PERCONA_DATABASE}'
       - 'MYSQL_USER=${PERCONA_USER}'
@@ -209,7 +209,7 @@ services:
       - backend
   mssql:
     build:
-      context: ../laradock/mssql
+      context: ${LARADOCK_PATH}/mssql
     environment:
       - 'MSSQL_DATABASE=${MSSQL_DATABASE}'
       - 'SA_PASSWORD=${MSSQL_PASSWORD}'
@@ -221,7 +221,7 @@ services:
     networks:
       - backend
   mariadb:
-    build: ../laradock/mariadb
+    build: ${LARADOCK_PATH}/mariadb
     volumes:
       - '${DATA_SAVE_PATH}/mariadb:/var/lib/mysql'
       - '${MARIADB_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d'
@@ -235,7 +235,7 @@ services:
     networks:
       - backend
   postgres:
-    build: ../laradock/postgres
+    build: ${LARADOCK_PATH}/postgres
     volumes:
       - '${DATA_SAVE_PATH}/postgres:/var/lib/postgresql/data'
     ports:
@@ -247,7 +247,7 @@ services:
     networks:
       - backend
   postgres-postgis:
-    build: ../laradock/postgres-postgis
+    build: ${LARADOCK_PATH}/postgres-postgis
     volumes:
       - '${DATA_SAVE_PATH}/postgres:/var/lib/postgresql/data'
     ports:
@@ -259,7 +259,7 @@ services:
     networks:
       - backend
   neo4j:
-    build: ../laradock/neo4j
+    build: ${LARADOCK_PATH}/neo4j
     ports:
       - '7474:7474'
       - '1337:1337'
@@ -270,7 +270,7 @@ services:
     networks:
       - backend
   mongo:
-    build: ../laradock/mongo
+    build: ${LARADOCK_PATH}/mongo
     ports:
       - '${MONGODB_PORT}:27017'
     volumes:
@@ -278,7 +278,7 @@ services:
     networks:
       - backend
   rethinkdb:
-    build: ../laradock/rethinkdb
+    build: ${LARADOCK_PATH}/rethinkdb
     ports:
       - '${RETHINKDB_PORT}:8080'
     volumes:
@@ -286,7 +286,7 @@ services:
     networks:
       - backend
   redis:
-    build: ../laradock/redis
+    build: ${LARADOCK_PATH}/redis
     volumes:
       - '${DATA_SAVE_PATH}/redis:/data'
     ports:
@@ -294,7 +294,7 @@ services:
     networks:
       - backend
   aerospike:
-    build: ../laradock/aerospike
+    build: ${LARADOCK_PATH}/aerospike
     volumes_from:
       - workspace
     volumes:
@@ -307,7 +307,7 @@ services:
     networks:
       - backend
   memcached:
-    build: ../laradock/memcached
+    build: ${LARADOCK_PATH}/memcached
     volumes:
       - '${DATA_SAVE_PATH}/memcached:/var/lib/memcached'
     ports:
@@ -317,7 +317,7 @@ services:
     networks:
       - backend
   beanstalkd:
-    build: ../laradock/beanstalkd
+    build: ${LARADOCK_PATH}/beanstalkd
     ports:
       - '${BEANSTALKD_HOST_PORT}:11300'
     privileged: true
@@ -326,7 +326,7 @@ services:
     networks:
       - backend
   rabbitmq:
-    build: ../laradock/rabbitmq
+    build: ${LARADOCK_PATH}/rabbitmq
     ports:
       - '${RABBITMQ_NODE_HOST_PORT}:5672'
       - '${RABBITMQ_MANAGEMENT_HTTP_HOST_PORT}:15672'
@@ -340,7 +340,7 @@ services:
     networks:
       - backend
   beanstalkd-console:
-    build: ../laradock/beanstalkd-console
+    build: ${LARADOCK_PATH}/beanstalkd-console
     ports:
       - '2080:2080'
     depends_on:
@@ -348,7 +348,7 @@ services:
     networks:
       - backend
   caddy:
-    build: ../laradock/caddy
+    build: ${LARADOCK_PATH}/caddy
     volumes_from:
       - applications
     volumes:
@@ -364,7 +364,7 @@ services:
       - frontend
       - backend
   phpmyadmin:
-    build: ../laradock/phpmyadmin
+    build: ${LARADOCK_PATH}/phpmyadmin
     environment:
       - PMA_ARBITRARY=1
       - 'MYSQL_USER=${PMA_USER}'
@@ -379,7 +379,7 @@ services:
       - backend
   adminer:
     build:
-      context: ../laradock/adminer
+      context: ${LARADOCK_PATH}/adminer
       args:
         - 'INSTALL_MSSQL=${ADM_INSTALL_MSSQL}'
     ports:
@@ -390,7 +390,7 @@ services:
       - frontend
       - backend
   pgadmin:
-    build: ../laradock/pgadmin
+    build: ${LARADOCK_PATH}/pgadmin
     ports:
       - '5050:5050'
     volumes:
@@ -401,7 +401,7 @@ services:
       - frontend
       - backend
   elasticsearch:
-    build: ../laradock/elasticsearch
+    build: ${LARADOCK_PATH}/elasticsearch
     volumes:
       - 'elasticsearch-data:/usr/share/elasticsearch/data'
       - 'elasticsearch-plugins:/usr/share/elasticsearch/plugins'
@@ -423,7 +423,7 @@ services:
       - frontend
       - backend
   kibana:
-    build: ../laradock/kibana
+    build: ${LARADOCK_PATH}/kibana
     ports:
       - '${KIBANA_HTTP_PORT}:5601'
     depends_on:
@@ -433,17 +433,17 @@ services:
       - backend
   certbot:
     build:
-      context: ../laradock/certbot
+      context: ${LARADOCK_PATH}/certbot
     volumes:
-      - '../laradock/data/certbot/certs/:/var/certs'
-      - '../laradock/certbot/letsencrypt/:/var/www/letsencrypt'
+      - '${LARADOCK_PATH}/data/certbot/certs/:/var/certs'
+      - '${LARADOCK_PATH}/certbot/letsencrypt/:/var/www/letsencrypt'
     environment:
       - CN="fake.domain.com"
       - EMAIL="fake.email@gmail.com"
     networks:
       - frontend
   mailhog:
-    build: ../laradock/mailhog
+    build: ${LARADOCK_PATH}/mailhog
     ports:
       - '1025:1025'
       - '8025:8025'
@@ -451,7 +451,7 @@ services:
       - frontend
       - backend
   selenium:
-    build: ../laradock/selenium
+    build: ${LARADOCK_PATH}/selenium
     ports:
       - '${SELENIUM_PORT}:4444'
     volumes:
@@ -459,7 +459,7 @@ services:
     networks:
       - frontend
   proxy:
-    build: ../laradock/varnish
+    build: ${LARADOCK_PATH}/varnish
     expose:
       - '${VARNISH_PORT}'
     environment:
@@ -475,7 +475,7 @@ services:
     networks:
       - frontend
   proxy2:
-    build: ../laradock/varnish
+    build: ${LARADOCK_PATH}/varnish
     expose:
       - '${VARNISH_PORT}'
     environment:
@@ -491,7 +491,7 @@ services:
     networks:
       - frontend
   balancer:
-    build: ../laradock/haproxy
+    build: ${LARADOCK_PATH}/haproxy
     ports:
       - '${HAPROXY_HOST_HTTP_PORT}:8085'
     volumes:
@@ -500,7 +500,7 @@ services:
       - proxy
       - proxy2
   jenkins:
-    build: ../laradock/jenkins
+    build: ${LARADOCK_PATH}/jenkins
     environment:
       JAVA_OPTS: '-Djava.awt.headless=true'
     ports:
@@ -515,9 +515,9 @@ services:
       - backend
   laravel-echo-server:
     build:
-      context: ../laradock/laravel-echo-server
+      context: ${LARADOCK_PATH}/laravel-echo-server
     volumes:
-      - '../laradock/laravel-echo-server/laravel-echo-server.json:/app/laravel-echo-server.json:ro'
+      - '${LARADOCK_PATH}/laravel-echo-server/laravel-echo-server.json:/app/laravel-echo-server.json:ro'
     ports:
       - '${LARAVEL_ECHO_SERVER_PORT}:6001'
     links:
@@ -527,7 +527,7 @@ services:
       - backend
   aws:
     build:
-      context: ../laradock/aws
+      context: ${LARADOCK_PATH}/aws
     volumes_from:
       - applications
     depends_on:
