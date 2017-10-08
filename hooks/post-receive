@@ -58,7 +58,7 @@ if [ -e "$PROJECT_PATH/$BRANCH".env ]; then
 fi
 
 docker-compose down
-docker-compose up -d workspace mysql phpmyadmin
+docker-compose up -d workspace nginx phpmyadmin
 docker-compose exec -T workspace composer install
 docker-compose exec -T workspace php artisan migrate --force
 docker-compose exec -T workspace php artisan db:seed --force
