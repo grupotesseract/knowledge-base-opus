@@ -25,7 +25,7 @@ esac
 # Variáveis do projeto
 # ==========================================
 PROJECT="tesseract-kb"
-PROJECT_PATH="/var/www/$PROJECT"
+PROJECT_PATH="/var/www/html/$PROJECT"
 BARE="$PROJECT_PATH".git
 
 # Clone ou Pull
